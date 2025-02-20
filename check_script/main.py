@@ -5,13 +5,13 @@ from math import fabs
 
 #定义读取excel表格
 def read_excel(filename):
-    requirements = pd.read_excel(filename)
+    requirements = pd.read_excel(filename, index_col=0)
     return requirements
 
 #定义写入excel表格
 def write_excel(df):
     filename = time.strftime("%Y-%m-%d_%H-%M-%S.xlsx", time.localtime(time.time()))
-    df.to_excel(filename, index=False)
+    df.to_excel(filename, index=True)
 
 #定义python到adb的接口
 def adb_shell(cmd):
@@ -39,6 +39,10 @@ def get_sys_meminfo():
             mem_info[key.strip()] = int(value.split()[0])  # 只取数值部分并转换为整数
         return mem_info
 
+#获取CPU负载
+def get_cpu_load():
+    cmd = "adb shell "
+
 def judge_exact(requirement, actual):
     if requirement == actual:
         ret = 1.0
@@ -55,18 +59,18 @@ def judge_rough(requirement, actual):
 
 def compare(requirement):
     #判断安卓版本
-    version_requirement = requirements.get("Android_version")[0]
+    version_requirement = requirements.loc["Android_version", "requirements"]
     version_actual = get_sys_version()
-    requirements.loc[requirements["mode"] == "actual", "Android_version"] = version_actual
-    requirements.loc[requirements["mode"] == "satisfy", "Android_version"] = judge_exact(version_requirement, version_actual)
+    requirements.loc["Android_version", "actual"] = version_actual
+    requirements.loc["Android_version", "satisfy"] = judge_exact(version_requirement, version_actual)
 
     #判断内存条件
     meminfo = get_sys_meminfo()
-    mem_requirement = requirements.get("Memory")[0]
+    mem_requirement = requirements.loc["Memory", "requirements"]
     mem_actual = meminfo.get("MemTotal") / 1024 / 1024  # 单位MB
     print(mem_actual)
-    requirements.loc[requirements["mode"] == "actual", "Memory"] = mem_actual
-    requirements.loc[requirements["mode"] == "satisfy", "Memory"] = judge_rough(mem_requirement, mem_actual)
+    requirements.loc["Memory", "actual"] = mem_actual
+    requirements.loc["Memory", "satisfy"] = judge_rough(mem_requirement, mem_actual)
 
     return requirement
 
