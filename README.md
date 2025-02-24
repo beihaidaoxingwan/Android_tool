@@ -1,5 +1,11 @@
 # Android_tool
 
+## 2025.2.24更新功能
+1. 判断lmk参数
+2. 判断wirte_back参数（包含dirty_ratio_actual, dirty_background_ratio_actual）
+3. 判断readahead参数
+4. 判断io调度器
+
 ## 2025.2.21更新功能
 1. Kernel版本的对比功能
 2. User版本的对比功能
